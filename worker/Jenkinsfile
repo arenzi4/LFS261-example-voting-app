@@ -1,20 +1,27 @@
 pipeline {
     agent any          
-
+// cuando hay cambios
     stages{
-        stage("one"){
+        stage("build"){
+        	when{
+        		changeset "**/result/**"
+        	}
             steps{
-                 echo 'steps, eurosteps 1'
+            	echo 'Building app'
+            	dir('result'){
+            		sh 'npm install'
+            	}
             }
         }
-        stage("two"){
+        stage("test"){
+                when{
+        		changeset "**/result/**"
+        	}
             steps{
-                 echo 'step 2'
-            }
-        }
-        stage("three"){
-            steps{
-                 echo 'step 3'
+                 echo 'Testing app'
+                 dir('result'){
+                 	sh 'npm test'
+                 }
             }
         }
     }       
@@ -23,6 +30,7 @@ pipeline {
         always{      
 
              echo 'This pipeline is completed.'
+             slackSend (channel: "#result-commits", message: "Pipeline execution complete: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
         }
     }
 }
