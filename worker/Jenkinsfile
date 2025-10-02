@@ -1,21 +1,36 @@
-/* groovylint-disable NestedBlockDepth */
+/* groovylint-disable DuplicateStringLiteral, NestedBlockDepth */
+/* groovylint-disable-next-line CompileStatic */
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.8-sapmachine-21'
-            args '-v $HOME/.m2:/root/.m2'
-        }
-    }
+    agent none
     stages {
         stage('build') {
+            when {
+                changeset '**/worker/**'
+            }
+            agent {
+                docker {
+                    image 'maven:3.9.8-sapmachine-21'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'building worker app'
                 dir('worker') {
                     sh 'mvn compile'
                 }
+            /* groovylint-disable-next-line DuplicateStringLiteral */
             }
         }
         stage('test') {
+            when {
+                changeset '**/worker/**'
+            }
+            agent {
+                docker {
+                    image 'maven:3.9.8-sapmachine-21'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'running unit tests on worker app'
                 dir('worker') {
@@ -24,6 +39,15 @@ pipeline {
             }
         }
         stage('package') {
+            when {
+                changeset '**/worker/**'
+            }
+            agent {
+                docker {
+                    image 'maven:3.9.8-sapmachine-21'
+                    args '-v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                 echo 'packaging worker app into a jar file'
                 dir('worker') {
